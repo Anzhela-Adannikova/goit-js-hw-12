@@ -132,6 +132,31 @@
   text-align: center !important;
 }
 
+.button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 32px;
+}
+
 .load-more-hidden {
   display: none;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  width: 125px;
+  height: 40px;
+  background: #4e75ff;
+  align-items: center;
+
+  font-family: 'Montserrat';
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  color: #ffffff;
+}
+
+.load-more-hidden:hover {
+  background-color: #6c8cff;
 }

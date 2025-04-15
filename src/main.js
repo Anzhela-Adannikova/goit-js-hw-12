@@ -22,6 +22,7 @@ const loadMore = document.querySelector('.js-load-more');
 loadMore.addEventListener("click", onLoadMore);
 
 let page = 1;
+let query = '';
 
 console.dir(form);
 
@@ -32,21 +33,24 @@ const lightbox = new SimpleLightbox('.gallery a', {
 });
 
 hideLoader();
+hideLoadMoreButton();
 
 form.addEventListener('submit', handleSearch);
 
-function handleSearch (event) {
+async function handleSearch(event) {
     event.preventDefault();
 
-    const query = form.elements['search-text'].value.trim();
+    query = form.elements['search-text'].value.trim();
 
     if(!query) return;
     
     clearGallery();
+    page = 1;
     showLoader();
 
-    getImagesByQuery(query, page = 1)
-        .then(({ hits }) => {
+    try {
+        const { hits, totalHits } = await getImagesByQuery(query, page);
+    
             if(hits.length === 0) {
                 iziToast.info({
                     message: 'Sorry, there are no images matching your search query. Please try again!',
@@ -56,17 +60,28 @@ function handleSearch (event) {
                     iconColor: ' #fafafb',
                     iconUrl: iconPath,
                 });
-            return;
-
+                hideLoadMoreButton();
+                return;
             }
+
             gallery.innerHTML = createGallery(hits);
             lightbox.refresh();
 
-            if(data.page < data.total_pages) {
-                loadMore.classList.replace("load-more-hidden", "load-more");
+            const totalPages = Math.ceil(totalHits / 15);
+            if (page < totalPages) {
+                showLoadMoreButton();
+            } else {
+                hideLoadMoreButton();
+                iziToast.info({
+                    message: "We're sorry, but you've reached the end of search results.",
+                    backgroundColor: '#4caf50',
+                    maxWidth: '434',
+                    messageColor:' #fafafb',
+                    iconColor: ' #fafafb',
+                    iconUrl: iconPath,
+                });
             }
-        })
-        .catch(() => {
+        } catch (error) {
             iziToast.info({
                 message: 'Something went wrong!',
                 backgroundColor:' #ef4040',
@@ -75,29 +90,62 @@ function handleSearch (event) {
                 iconColor: ' #fafafb',
                 iconUrl: iconPath,
             });
-        })
-        .finally(() => {
+        } finally {
             hideLoader();
-        });
-        form.reset();
-};
+        }
+
+    form.reset();
+}
 
 async function onLoadMore() {
     page++;
+    showLoader();
     loadMore.disabled = true;
 
     try {
-        const data = await serviceMovie(page);
+        const { hits, totalHits } = await getImagesByQuery(query, page)
+        gallery.insertAdjacentHTML('beforeend', createGallery(hits));
+        lightbox.refresh();
 
-        container.insertAdjacentHTML("beforeend", createMarkup(data.results));
-        loadMore.disabled = false;
-
-        if(data.page >= data.total_pages) {
-            loadMore.classList.replace("load-more", "load-more-hidden");
+        const totalPages = Math.ceil(totalHits / 15);
+        if (page >= totalPages) {
+            hideLoadMoreButton();
+            iziToast.info({
+                message: "We're sorry, but you've reached the end of search results.",
+                backgroundColor: '#4caf50',
+                maxWidth: '434',
+                messageColor:' #fafafb',
+                iconColor: ' #fafafb',
+                iconUrl: iconPath,
+            });
         }
-        return `We're sorry, but you've reached the end of search results.`;
 
-    } catch(error) {
-        alert(error.message);
-    }
+        loadMore.disabled = false;
+        } catch (error) {
+            iziToast.info({
+                message: 'Something went wrong while loading more images!',
+                backgroundColor:' #ef4040',
+                maxWidth: '434',
+                messageColor:' #fafafb',
+                iconColor: ' #fafafb',
+                iconUrl: iconPath, 
+            });
+        } finally {
+            hideLoader();
+        }
 }
+//     try {
+//         const data = await serviceMovie(page);
+
+//         container.insertAdjacentHTML("beforeend", createMarkup(data.results));
+//         loadMore.disabled = false;
+
+//         if(data.page >= data.total_pages) {
+//             loadMore.classList.replace("load-more", "load-more-hidden");
+//         }
+//         return `We're sorry, but you've reached the end of search results.`;
+
+//     } catch(error) {
+//         alert(error.message);
+//     }
+// }
