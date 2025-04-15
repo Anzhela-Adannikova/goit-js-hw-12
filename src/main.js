@@ -107,6 +107,15 @@ async function onLoadMore() {
         gallery.insertAdjacentHTML('beforeend', createGallery(hits));
         lightbox.refresh();
 
+        const { height: cardHeight } = document
+            .querySelector(".gallery")
+            .firstElementChild.getBoundingClientRect();
+
+        window.scrollBy({
+            top: cardHeight * 2.5,
+            behavior: "smooth",
+        })
+
         const totalPages = Math.ceil(totalHits / 15);
         if (page >= totalPages) {
             hideLoadMoreButton();
@@ -134,18 +143,3 @@ async function onLoadMore() {
             hideLoader();
         }
 }
-//     try {
-//         const data = await serviceMovie(page);
-
-//         container.insertAdjacentHTML("beforeend", createMarkup(data.results));
-//         loadMore.disabled = false;
-
-//         if(data.page >= data.total_pages) {
-//             loadMore.classList.replace("load-more", "load-more-hidden");
-//         }
-//         return `We're sorry, but you've reached the end of search results.`;
-
-//     } catch(error) {
-//         alert(error.message);
-//     }
-// }
