@@ -3,7 +3,7 @@ import "izitoast/dist/css/iziToast.min.css";
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 
-import { getImagesByQuery } from '../js/pixabay-api';
+import { getImagesByQuery } from './js/pixabay-api';
 import { 
     createGallery,
     clearGallery,
@@ -12,7 +12,7 @@ import {
     gallery,
     showLoadMoreButton,
     hideLoadMoreButton
-} from '../js/render-functions.js';
+} from './js/render-functions.js';
 
 const iconPath = new URL('./img/icon-error.svg', import.meta.url).href;
 
