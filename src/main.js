@@ -131,6 +131,7 @@ async function onLoadMore() {
 
         loadMore.disabled = false;
         } catch (error) {
+            hideLoadMoreButton();
             iziToast.info({
                 message: 'Something went wrong while loading more images!',
                 backgroundColor:' #ef4040',
